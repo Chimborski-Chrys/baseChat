@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from "axios";
 
 /**
  * Cliente Axios configurado para a API do chat Rys
@@ -10,61 +10,67 @@ import axios from 'axios'
  */
 const chatApi = axios.create({
   // Altere para a URL da sua API em produção
-  baseURL: import.meta.env.VITE_API_URL || 'https://localhost:7266/api/',
+  // baseURL: import.meta.env.VITE_API_URL || 'https://localhost:7266/api/',
+  baseURL: import.meta.env.VITE_API_URL || "https://server-mcp.fly.dev/api/",
   timeout: 30000, // 30 segundos
   headers: {
-    'Content-Type': 'application/json'
-  }
-})
+    "Content-Type": "application/json",
+  },
+});
 
 // Interceptor de requisição
 chatApi.interceptors.request.use(
   (config) => {
     // Log de requisição em desenvolvimento
     if (import.meta.env.DEV) {
-      console.log('[Chat API Request]:', config.method.toUpperCase(), config.url)
+      console.log(
+        "[Chat API Request]:",
+        config.method.toUpperCase(),
+        config.url,
+      );
     }
-    return config
+    return config;
   },
   (error) => {
-    return Promise.reject(error)
-  }
-)
+    return Promise.reject(error);
+  },
+);
 
 // Interceptor de resposta
 chatApi.interceptors.response.use(
   (response) => {
     // Log de resposta em desenvolvimento
     if (import.meta.env.DEV) {
-      console.log('[Chat API Response]:', response.status, response.data)
+      console.log("[Chat API Response]:", response.status, response.data);
     }
-    return response
+    return response;
   },
   (error) => {
     // Log de erros
-    console.error('[Chat API Error]:', {
+    console.error("[Chat API Error]:", {
       message: error.message,
       code: error.code,
-      response: error.response?.data
-    })
+      response: error.response?.data,
+    });
 
     // Adicionar informações úteis ao erro
-    if (error.code === 'ECONNABORTED') {
-      error.userMessage = 'A conexão demorou muito tempo. Tente novamente.'
+    if (error.code === "ECONNABORTED") {
+      error.userMessage = "A conexão demorou muito tempo. Tente novamente.";
     } else if (!error.response) {
-      error.userMessage = 'Sem conexão com o servidor. Verifique sua internet.'
+      error.userMessage = "Sem conexão com o servidor. Verifique sua internet.";
     } else if (error.response.status >= 500) {
-      error.userMessage = 'Erro no servidor. Tente novamente em instantes.'
+      error.userMessage = "Erro no servidor. Tente novamente em instantes.";
     } else if (error.response.status === 429) {
-      error.userMessage = 'Muitas requisições. Aguarde alguns instantes.'
+      error.userMessage = "Muitas requisições. Aguarde alguns instantes.";
     } else if (error.response.status === 401) {
-      error.userMessage = 'Não autorizado. Verifique suas credenciais.'
+      error.userMessage = "Não autorizado. Verifique suas credenciais.";
     } else if (error.response.status === 400) {
-      error.userMessage = error.response.data?.message || 'Requisição inválida.'
+      error.userMessage =
+        error.response.data?.message || "Requisição inválida.";
     }
 
-    return Promise.reject(error)
-  }
-)
+    return Promise.reject(error);
+  },
+);
 
-export default chatApi
+export default chatApi;
